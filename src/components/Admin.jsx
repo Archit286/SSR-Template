@@ -1,12 +1,11 @@
 import React from "react";
-import "./Home.css";
 
 class Admin extends React.Component {
   render() {
     return (
       <div className="Home">
         <div className="Home-header">
-          <h2>Main Page</h2>
+          <h2>Admin Page</h2>
         </div>
         <p className="Home-intro">
           To get started, edit <code>src/App.js</code> or{" "}

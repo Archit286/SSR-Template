@@ -1,55 +1,119 @@
 var path = require("path");
 var webpack = require("webpack");
 var nodeExternals = require("webpack-node-externals");
+var HtmlWebpackPlugin = require("html-webpack-plugin");
+var CopyPlugin = require("copy-webpack-plugin");
+var MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-var browserConfig = {
-  entry: "./src/browser/index.js",
+var clientConfig = {
+  entry: "./src/index.js",
   output: {
-    path: path.resolve(__dirname, "public"),
+    path: path.join(__dirname, "/build"),
     filename: "bundle.js",
     publicPath: "/",
   },
   module: {
     rules: [
-      { test: /\.(js)$/, use: "babel-loader" },
       {
-        test: /\.css$/,
-        loaders: ["style-loader", "css-loader"],
+        test: /\.(js|jsx)/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+        },
+        resolve: {
+          extensions: [".js", ".jsx"],
+        },
+      },
+      {
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
+      },
+      {
+        test: /\.(png|svg|jpg|gif|JPG)$/,
+        use: [
+          {
+            loader: "url-loader",
+            options: {
+              limit: 8192,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/,
+        use: ["url-loader"],
       },
     ],
   },
-  mode: "production",
   plugins: [
     new webpack.DefinePlugin({
       __isBrowser__: "true",
     }),
+    new HtmlWebpackPlugin({
+      template: "./src/template/index.html",
+      filename: "public/index.html",
+      scriptLoading: "defer",
+      favicon: "./src/template/favicon.ico",
+    }),
+    new CopyPlugin({
+      patterns: [
+        "src/template/logo192.png",
+        "src/template/logo512.png",
+        "src/template/robots.txt",
+        "src/template/manifest.json",
+      ],
+    }),
+    new MiniCssExtractPlugin(),
   ],
 };
 
 var serverConfig = {
-  entry: "./src/server/index.js",
+  entry: "./server/index.js",
   target: "node",
   externals: [nodeExternals()],
   output: {
-    path: __dirname,
+    path: path.join(__dirname, "/dist"),
     filename: "server.js",
-    publicPath: "/",
   },
-  mode: "production",
   module: {
     rules: [
-      { test: /\.(js)$/, use: "babel-loader" },
       {
-        test: /\.css$/,
-        loader: "css-loader",
+        test: /\.(js|jsx)/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+        },
+        resolve: {
+          extensions: [".js", ".jsx"],
+        },
+      },
+      {
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
+      },
+      {
+        test: /\.(png|svg|jpg|gif|JPG)$/,
+        use: [
+          {
+            loader: "url-loader",
+            options: {
+              limit: 8192,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/,
+        use: ["url-loader"],
       },
     ],
   },
   plugins: [
     new webpack.DefinePlugin({
-      __isBrowser__: "false",
+      __isBrowser__: "true",
     }),
+    new MiniCssExtractPlugin(),
   ],
 };
 
-module.exports = [browserConfig, serverConfig];
+module.exports = [clientConfig, serverConfig];

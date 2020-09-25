@@ -1,7 +1,6 @@
 import React from "react";
-import "./Home.css";
 
-class Admin extends React.Component {
+class Check extends React.Component {
   render() {
     return (
       <div className="Home">
@@ -28,4 +27,4 @@ class Admin extends React.Component {
   }
 }
 
-export default Admin;
+export default Check;
